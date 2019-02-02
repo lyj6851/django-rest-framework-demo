@@ -22,6 +22,7 @@ class ShopCartDetailSerializer(serializers.ModelSerializer):
 
 
 class ShopCartSerializer(serializers.Serializer):
+    # 因为用户和商品组合唯一，修改数量时，默认会报错，所以不用modelserializer
     # 使用Serializer本身最好, 因为它是灵活性最高的。
     user = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
@@ -32,6 +33,17 @@ class ShopCartSerializer(serializers.Serializer):
                                         "required": "请选择购买数量"
                                     })
     goods = serializers.PrimaryKeyRelatedField(required=True, queryset=Goods.objects.all())
+
+    # 重写baseserializer
+    # 对于字段的具体验证放在serializer中
+    #
+    '''
+    def update(self, instance, validated_data):
+        raise NotImplementedError('`update()` must be implemented.')
+
+    def create(self, validated_data):
+        raise NotImplementedError('`create()` must be implemented.')
+    '''
 
     def create(self, validated_data):
         user = self.context["request"].user
