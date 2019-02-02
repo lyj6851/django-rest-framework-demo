@@ -92,12 +92,20 @@ class GoodsListViewSet(CacheResponseMixin, mixins.ListModelMixin, mixins.Retriev
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # 商品点击数+1
+    # 重载retrieve方法，每去一次，商品的click_num属性值加一
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.click_num += 1
         instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+    # 原retrieve方法
+    ''' def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+    '''
 
 
 class CategoryViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):

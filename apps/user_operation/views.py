@@ -11,7 +11,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.authentication import SessionAuthentication
 
 
-class UserFavViewset(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin,mixins.RetrieveModelMixin,
+class UserFavViewset(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin,
                      mixins.DestroyModelMixin):
     """
     list:
@@ -36,6 +36,9 @@ class UserFavViewset(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Crea
     #     goods = instance.goods
     #     goods.fav_num +=1
     #     goods.save()
+    '''    def perform_create(self, serializer):
+        serializer.save()
+    '''
 
     def get_queryset(self):
         # list

@@ -45,14 +45,18 @@ class ShoppingCartViewset(viewsets.ModelViewSet):
 
     # 更新库存
     def perform_update(self, serializer):
+        # 先获取之前的数据existed_nums
         existed_record = ShoppingCart.objects.get(id=serializer.instance.id)
         existed_nums = existed_record.nums
-        # 先保存之前的数据existed_nums
+        # 取得新更新的对象
         saved_record = serializer.save()
         # 变化的数量
         nums = saved_record.nums - existed_nums
+        # 取得产品的对象
         goods = saved_record.goods
+        # 更新库存值
         goods.goods_num -= nums
+        # 保存库存值
         goods.save()
 
     def get_serializer_class(self):
