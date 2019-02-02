@@ -33,10 +33,12 @@ class ShopCartSerializer(serializers.Serializer):
                                         "required": "请选择购买数量"
                                     })
     goods = serializers.PrimaryKeyRelatedField(required=True, queryset=Goods.objects.all())
+    # 这里many=flase 商品数量一对一
 
     # 重写baseserializer
     # 对于字段的具体验证放在serializer中
-    #
+    # 默认情况下，此字段是读写的，但您可以使用该read_only标志更改此行为。
+    # queryset - 验证字段输入时用于模型实例查找的查询集。
     '''
     def update(self, instance, validated_data):
         raise NotImplementedError('`update()` must be implemented.')
@@ -49,6 +51,7 @@ class ShopCartSerializer(serializers.Serializer):
         user = self.context["request"].user
         nums = validated_data["nums"]
         goods = validated_data["goods"]
+        # 相当于在fields中添加字段
 
         existed = ShoppingCart.objects.filter(user=user, goods=goods)
 
@@ -85,9 +88,9 @@ class OrderSerializer(serializers.ModelSerializer):
     trade_no = serializers.CharField(read_only=True)
     order_sn = serializers.CharField(read_only=True)
     pay_time = serializers.DateTimeField(read_only=True)
-
     alipay_url = serializers.SerializerMethodField(read_only=True)
 
+    # 支付宝
     def get_alipay_url(self, obj):
         alipay = AliPay(
             appid="2016091200490210",
@@ -107,6 +110,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
         return re_url
 
+    # 订单号
     def generate_order_sn(self):
         # 当前时间+userid+随机数
         from random import Random
@@ -117,6 +121,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
         return order_sn
 
+    # 订单号添加到数据库
     def validate(self, attrs):
         attrs["order_sn"] = self.generate_order_sn()
         return attrs

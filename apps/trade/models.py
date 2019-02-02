@@ -16,7 +16,7 @@ class ShoppingCart(models.Model):
     购物车
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=u"用户")
-    goods = models.ForeignKey(Goods, on_delete=models.CASCADE, verbose_name=u"商品名称")
+    goods = models.ForeignKey(Goods, on_delete=models.CASCADE, verbose_name=u"商品名称", related_name='shop_goods')
     nums = models.IntegerField(default=0, verbose_name="购买数量")
 
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u"添加时间")
@@ -48,7 +48,7 @@ class OrderInfo(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户")
-    # unique订单号唯一
+    # unique订单号唯一,自动生成
     order_sn = models.CharField(max_length=30, null=True, blank=True, unique=True, verbose_name="订单编号")
     # 微信支付可能会用到
     nonce_str = models.CharField(max_length=50, null=True, blank=True, unique=True, verbose_name="随机加密串")
@@ -58,11 +58,11 @@ class OrderInfo(models.Model):
     pay_status = models.CharField(choices=ORDER_STATUS, default="paying", max_length=30, verbose_name="订单状态")
     # 订单的支付类型
     pay_type = models.CharField(choices=PAY_TYPE, default="alipay", max_length=10, verbose_name="支付类型")
-    post_script = models.CharField(max_length=200, verbose_name="订单留言")
+    post_script = models.CharField(max_length=200, verbose_name="订单留言", default='')
     order_mount = models.FloatField(default=0.0, verbose_name="订单金额")
     pay_time = models.DateTimeField(null=True, blank=True, verbose_name="支付时间")
 
-    # 用户的基本信息
+    # 用户的基本信息，不作外键，防止用户修改了这些信息
     address = models.CharField(max_length=100, default="", verbose_name="收货地址")
     signer_name = models.CharField(max_length=20, default="", verbose_name="签收人")
     singer_mobile = models.CharField(max_length=11, verbose_name="联系电话")

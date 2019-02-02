@@ -14,7 +14,7 @@ User = get_user_model()
 
 
 class SmsSerializer(serializers.Serializer):
-    mobile = serializers.CharField(max_length=11)
+    mobile = serializers.CharField(max_length=11, min_length=11)
 
     def validate_mobile(self, mobile):
         """
@@ -45,6 +45,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("username", "gender", "birthday", "email", "mobile")
+
 
 class UserRegSerializer(serializers.ModelSerializer):
     code = serializers.CharField(required=True, write_only=True, max_length=4, min_length=4, label="验证码",

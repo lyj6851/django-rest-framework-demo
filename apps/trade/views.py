@@ -105,6 +105,7 @@ class OrderViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
 
             shop_cart.delete()
         return order
+        # 返回serilizer.save()的对象
 
 
 from rest_framework.views import APIView
