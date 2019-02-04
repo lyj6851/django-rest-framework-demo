@@ -1,3 +1,7 @@
+# encoding: utf-8
+__author__ = 'mtianyan'
+__date__ = '2018/3/12 0012 17:07'
+
 from datetime import datetime
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
@@ -71,8 +75,8 @@ class AliPay(object):
         unsigned_items = self.ordered_data(data)
         unsigned_string = "&".join("{0}={1}".format(k, v) for k, v in unsigned_items)
         sign = self.sign(unsigned_string.encode("utf-8"))
-        ordered_items = self.ordered_data(data)
-        quoted_string = "&".join("{0}={1}".format(k, quote_plus(v)) for k, v in ordered_items)
+        # ordered_items = self.ordered_data(data)
+        quoted_string = "&".join("{0}={1}".format(k, quote_plus(v)) for k, v in unsigned_items)
 
         # 获得最终的订单信息字符串
         signed_string = quoted_string + "&sign=" + quote_plus(sign)
@@ -117,32 +121,45 @@ class AliPay(object):
         message = "&".join(u"{}={}".format(k, v) for k, v in unsigned_items)
         return self._verify(message, signature)
 
+# if __name__ == "__main__":
+# return_url = ''
+# o = urlparse(return_url)
+# query = parse_qs(o.query)
+# processed_query = {}
+# ali_sign = query.pop("sign")[0]
 
-if __name__ == "__main__":
-    # return_url = 'http://47.92.87.172:8000/?total_amount=0.01&timestamp=2017-08-15+17%3A15%3A13&sign=jnnA1dGO2iu2ltMpxrF4MBKE20Akyn%2FLdYrFDkQ6ckY3Qz24P3DTxIvt%2BBTnR6nRk%2BPAiLjdS4sa%2BC9JomsdNGlrc2Flg6v6qtNzTWI%2FEM5WL0Ver9OqIJSTwamxT6dW9uYF5sc2Ivk1fHYvPuMfysd90lOAP%2FdwnCA12VoiHnflsLBAsdhJazbvquFP%2Bs1QWts29C2%2BXEtIlHxNgIgt3gHXpnYgsidHqfUYwZkasiDGAJt0EgkJ17Dzcljhzccb1oYPSbt%2FS5lnf9IMi%2BN0ZYo9%2FDa2HfvR6HG3WW1K%2FlJfdbLMBk4owomyu0sMY1l%2Fj0iTJniW%2BH4ftIfMOtADHA%3D%3D&trade_no=2017081521001004340200204114&sign_type=RSA2&auth_app_id=2016080600180695&charset=utf-8&seller_id=2088102170208070&method=alipay.trade.page.pay.return&app_id=2016080600180695&out_trade_no=201702021222&version=1.0'
+# 测试用例
+# alipay = AliPay(
+#     # appid在沙箱环境中就可以找到
+#     appid="2016091200490210",
+#     # 这个值先不管，在与vue的联调中介绍
+#     app_notify_url="http://115.159.122.64:8000/alipay/return/",
+#     # 我们自己商户的密钥
+#     app_private_key_path="../trade/keys/private_2048.txt",
+#     # 支付宝的公钥
+#     alipay_public_key_path="../trade/keys/alipay_key_2048.txt",  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
+#     # debug为true时使用沙箱的url。如果不是用正式环境的url
+#     debug=True,  # 默认False,
+#
+#     # 先不用管，后面vue解释
+#     return_url="http://115.159.122.64:8000/alipay/return/"
+# )
 
-    alipay = AliPay(
-        appid="2016092300578435",
-        app_notify_url="http://projectsedus.com/",
-        app_private_key_path="../trade/keys/private_2048.txt",
-        alipay_public_key_path="../trade/keys/alipay_key_2048.txt",  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
-        debug=True,  # 默认False,
-        # sign_type="RSA2",  # RSA 或者 RSA2
-        return_url="http://127.0.0.1:8000/"
-    )
+# for key, value in query.items():
+#     processed_query[key] = value[0]
+# print (alipay.verify(processed_query, ali_sign))
 
-    # o = urlparse(return_url)
-    # query = parse_qs(o.query)
-    # processed_query = {}
-    # ali_sign = query.pop("sign")[0]
-    # for key, value in query.items():
-    #     processed_query[key] = value[0]
-    # print(alipay.verify(processed_query, ali_sign))
-
-    url = alipay.direct_pay(
-        subject="测试订单",
-        out_trade_no="201702021222",
-        total_amount=0.01
-    )
-    re_url = "https://openapi.alipaydev.com/gateway.do?{data}".format(data=url)
-    print(re_url)
+# # 直接支付:生成请求的字符串。
+# url = alipay.direct_pay(
+#     # 订单标题
+#     subject="测试订单",
+#     # 我们商户自行生成的订单号
+#     out_trade_no="20180314006",
+#     # 订单金额
+#     total_amount=9999,
+#     return_url="http://115.159.122.64:8000/alipay/return/"
+# )
+# # 将生成的请求字符串拿到我们的url中进行拼接
+# re_url = "https://openapi.alipaydev.com/gateway.do?{data}".format(data=url)
+#
+# print(re_url)

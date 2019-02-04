@@ -20,7 +20,6 @@ class SmsSerializer(serializers.Serializer):
         """
         验证手机号码(函数名称必须为validate_ + 字段名)
         """
-        # 手机是否注册
         if User.objects.filter(mobile=mobile).count():
             raise serializers.ValidationError("用户已经存在")
 

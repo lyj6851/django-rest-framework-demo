@@ -45,6 +45,7 @@ class CategorySerializer2(serializers.ModelSerializer):
     """
     商品二级类别序列化
     """
+    # 使用sub_cat这个relate_name可以在all中自动识别是反向引用的外键
     sub_cat = CategorySerializer3(many=True)
 
     class Meta:

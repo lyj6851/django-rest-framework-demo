@@ -11,6 +11,10 @@ from rest_framework.permissions import IsAuthenticated
 from trade.models import ShoppingCart, OrderInfo, OrderGoods
 from trade.serializers import ShopCartSerializer, ShopCartDetailSerializer, OrderSerializer, OrderDetailSerializer
 from utils.permissions import IsOwnerOrReadOnly
+from rest_framework.views import APIView
+from alipay import AliPay
+from VueDjangoFrameWorkShop.settings import ali_pub_key_path, private_key_path
+from rest_framework.response import Response
 
 
 class ShoppingCartViewset(viewsets.ModelViewSet):
@@ -106,12 +110,6 @@ class OrderViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
             shop_cart.delete()
         return order
         # 返回serilizer.save()的对象
-
-
-from rest_framework.views import APIView
-from utils.alipay import AliPay
-from VueDjangoFrameWorkShop.settings import ali_pub_key_path, private_key_path
-from rest_framework.response import Response
 
 
 class AlipayView(APIView):

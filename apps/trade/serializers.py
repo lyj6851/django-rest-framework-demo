@@ -89,6 +89,13 @@ class OrderSerializer(serializers.ModelSerializer):
     order_sn = serializers.CharField(read_only=True)
     pay_time = serializers.DateTimeField(read_only=True)
     alipay_url = serializers.SerializerMethodField(read_only=True)
+    singer_mobile = serializers.CharField(required=True, max_length=11, min_length=11, label='联系方式')
+    nonce_str = serializers.CharField(read_only=True)
+    add_time = serializers.DateTimeField(read_only=True)
+
+    # 注意名称和model的字段名一致
+
+    # 可以对field中的重新定义，但不会引用之前的verbose_name，需要添加label
 
     # 支付宝
     def get_alipay_url(self, obj):

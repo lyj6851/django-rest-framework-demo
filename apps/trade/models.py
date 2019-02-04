@@ -50,8 +50,9 @@ class OrderInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户")
     # unique订单号唯一,自动生成
     order_sn = models.CharField(max_length=30, null=True, blank=True, unique=True, verbose_name="订单编号")
+    # unique=True表示，必须是独特的
     # 微信支付可能会用到
-    nonce_str = models.CharField(max_length=50, null=True, blank=True, unique=True, verbose_name="随机加密串")
+    nonce_str = models.CharField(max_length=50, null=True, blank=True, default='', verbose_name="随机加密串")
     # 支付宝支付时的交易号与本系统进行关联
     trade_no = models.CharField(max_length=100, unique=True, null=True, blank=True, verbose_name=u"交易号")
     # 以防用户支付到一半不支付了
@@ -67,7 +68,7 @@ class OrderInfo(models.Model):
     signer_name = models.CharField(max_length=20, default="", verbose_name="签收人")
     singer_mobile = models.CharField(max_length=11, verbose_name="联系电话")
 
-    add_time = models.DateTimeField(default=datetime.now, verbose_name="添加时间")
+    add_time = models.DateTimeField(default=datetime.now, verbose_name="订单创建时间")
 
     class Meta:
         verbose_name = u"订单信息"
