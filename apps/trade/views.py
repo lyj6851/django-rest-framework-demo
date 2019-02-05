@@ -12,7 +12,8 @@ from trade.models import ShoppingCart, OrderInfo, OrderGoods
 from trade.serializers import ShopCartSerializer, ShopCartDetailSerializer, OrderSerializer, OrderDetailSerializer
 from utils.permissions import IsOwnerOrReadOnly
 from rest_framework.views import APIView
-from alipay import AliPay
+from utils.alipay import alipay
+
 from VueDjangoFrameWorkShop.settings import ali_pub_key_path, private_key_path
 from rest_framework.response import Response
 
@@ -79,6 +80,8 @@ class OrderViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
     订单管理
     list:
         获取个人订单
+    retrieve:
+        获取某个订单
     delete:
         删除订单
     create：
@@ -115,7 +118,7 @@ class OrderViewset(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
 class AlipayView(APIView):
     def get(self, request):
         """
-        处理支付宝的return_url返回
+        处理支付宝的return_url返回，跳转到相应的页面
         """
         processed_dict = {}
         # 1. 获取GET中参数
@@ -124,28 +127,28 @@ class AlipayView(APIView):
         # 2. 取出sign
         sign = processed_dict.pop("sign", None)
 
-        # 3. 生成ALipay对象
-        alipay = AliPay(
-            appid="2016091200490210",
-            app_notify_url="http://115.159.122.64:8000/alipay/return/",
-            app_private_key_path=private_key_path,
-            alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
-            debug=True,  # 默认False,
-            return_url="http://115.159.122.64:8000/alipay/return/"
-        )
+        # # 3. 生成ALipay对象
+        # alipay = AliPay(
+        #     appid="2016092300578435",
+        #     app_notify_url="http://127.0.0.1:8000/alipay/return/",
+        #     app_private_key_path=private_key_path,
+        #     alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
+        #     debug=True,  # 默认False,
+        #     return_url="http://127.0.0.1:8000/alipay/return/"
+        # )
 
         verify_re = alipay.verify(processed_dict, sign)
 
         # 这里可以不做操作。因为不管发不发return url。notify url都会修改订单状态。
-        if verify_re is True:
-            order_sn = processed_dict.get('out_trade_no', None)
-            trade_no = processed_dict.get('trade_no', None)
-
-            existed_orders = OrderInfo.objects.filter(order_sn=order_sn)
-            for existed_order in existed_orders:
-                existed_order.trade_no = trade_no
-                existed_order.pay_time = datetime.now()
-                existed_order.save()
+        if verify_re and processed_dict["trade_status"] in ("TRADE_SUCCESS", "TRADE_FINISHED"):
+            # order_sn = processed_dict.get('out_trade_no', None)
+            # trade_no = processed_dict.get('trade_no', None)
+            #
+            # existed_orders = OrderInfo.objects.filter(order_sn=order_sn)
+            # for existed_order in existed_orders:
+            #     existed_order.trade_no = trade_no
+            #     existed_order.pay_time = datetime.now()
+            #     existed_order.save()
 
             response = redirect("/index/#/app/home/member/order")
             # response.set_cookie("nextPath","pay", max_age=3)
@@ -166,20 +169,20 @@ class AlipayView(APIView):
         sign = processed_dict.pop("sign", None)
 
         # 2. 生成一个Alipay对象
-        alipay = AliPay(
-            appid="2016091200490210",
-            app_notify_url="http://115.159.122.64:8000/alipay/return/",
-            app_private_key_path=private_key_path,
-            alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
-            debug=True,  # 默认False,
-            return_url="http://115.159.122.64:8000/alipay/return/"
-        )
+        # alipay = AliPay(
+        #     appid="2016091200490210",
+        #     app_notify_url="http://127.0.0.1:8000/alipay/return/",
+        #     app_private_key_path=private_key_path,
+        #     alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
+        #     debug=True,  # 默认False,
+        #     return_url="http://127.0.0.1:8000/alipay/return/"
+        # )
 
         # 3. 进行验签，确保这是支付宝给我们的
         verify_re = alipay.verify(processed_dict, sign)
 
         # 如果验签成功
-        if verify_re is True:
+        if verify_re and processed_dict["trade_status"] in ("TRADE_SUCCESS", "TRADE_FINISHED"):
             order_sn = processed_dict.get('out_trade_no', None)
             trade_no = processed_dict.get('trade_no', None)
             trade_status = processed_dict.get('trade_status', None)
@@ -189,12 +192,15 @@ class AlipayView(APIView):
             for existed_order in existed_orders:
                 # 订单商品项
                 order_goods = existed_order.goods.all()
+                # order = models.ForeignKey(OrderInfo, related_name="goods")
+                # 通过relate_name 来获取外键
+                # existed_order.goods.all()
                 # 商品销量增加订单中数值
                 for order_good in order_goods:
                     goods = order_good.goods
                     goods.sold_num += order_good.goods_num
                     goods.save()
-
+                #
                 # 更新订单状态，填充支付宝给的交易凭证号。
                 existed_order.pay_status = trade_status
                 existed_order.trade_no = trade_no

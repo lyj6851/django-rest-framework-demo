@@ -6,7 +6,7 @@ from goods.models import Goods
 from goods.serializers import GoodsSerializer
 from rest_framework import serializers
 from trade.models import ShoppingCart, OrderInfo, OrderGoods
-from utils.alipay import AliPay
+from utils.alipay import alipay
 
 __author__ = 'mtianyan'
 __date__ = '2018/3/11 0011 16:19'
@@ -99,14 +99,14 @@ class OrderSerializer(serializers.ModelSerializer):
 
     # 支付宝
     def get_alipay_url(self, obj):
-        alipay = AliPay(
-            appid="2016091200490210",
-            app_notify_url="http://115.159.122.64:8000/alipay/return/",
-            app_private_key_path=private_key_path,
-            alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
-            debug=True,  # 默认False,
-            return_url="http://115.159.122.64:8000/alipay/return/"
-        )
+        # alipay = AliPay(
+        #     appid="2016092300578435",
+        #     app_notify_url="http://127.0.0.1:8000/alipay/return/",
+        #     app_private_key_path=private_key_path,
+        #     alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
+        #     debug=True,  # 默认False,
+        #     return_url="http://127.0.0.1:8000/alipay/return/"
+        # )
 
         url = alipay.direct_pay(
             subject=obj.order_sn,
@@ -145,14 +145,14 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     alipay_url = serializers.SerializerMethodField(read_only=True)
 
     def get_alipay_url(self, obj):
-        alipay = AliPay(
-            appid="2016091200490210",
-            app_notify_url="http://115.159.122.64:8000/alipay/return/",
-            app_private_key_path=private_key_path,
-            alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
-            debug=True,  # 默认False,
-            return_url="http://115.159.122.64:8000/alipay/return/"
-        )
+        # alipay = AliPay(
+        #     appid="2016091200490210",
+        #     app_notify_url="http://115.159.122.64:8000/alipay/return/",
+        #     app_private_key_path=private_key_path,
+        #     alipay_public_key_path=ali_pub_key_path,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
+        #     debug=True,  # 默认False,
+        #     return_url="http://115.159.122.64:8000/alipay/return/"
+        # )
 
         url = alipay.direct_pay(
             subject=obj.order_sn,

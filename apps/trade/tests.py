@@ -11,7 +11,7 @@ alipay = AliPay(
 )
 
 url = alipay.api_alipay_trade_page_pay(
-    out_trade_no="20161223818",
+    out_trade_no="201612238181",
     total_amount=8888,
     subject="wxw",
     return_url="https://www.baidu.com",
@@ -19,3 +19,30 @@ url = alipay.api_alipay_trade_page_pay(
 )
 re_url = "https://openapi.alipaydev.com/gateway.do?{data}".format(data=url)
 print(re_url)
+
+'''
+验证过程
+signature = data.pop("sign")
+success = alipay.verify(data, signature)
+if success and data["trade_status"] in ("TRADE_SUCCESS", "TRADE_FINISHED" ):
+    print("trade succeed")
+'''
+
+'''
+
+检验支付完成？
+alipay = AliPay(appid="", ...)
+
+result = alipay.api_alipay_trade_pay(
+    out_trade_no="out_trade_no",
+    scene="bar_code/wave_code",
+    auth_code="auth_code",
+    subject="subject",
+    discountable_amount=10,
+    total_amount=20,
+    notify_url="https://example.com/notify" # this is optional
+)
+
+if  result["code"] == "10000":
+    print("Order is paid")
+'''
