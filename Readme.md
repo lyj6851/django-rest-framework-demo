@@ -7,7 +7,7 @@
 
 项目支持支付宝支付(暂不支持微信支付),支持手机短信验证码注册， 支持第三方登录。集成了sentry错误监控系统。
 
-
+---
 python学习资源公众号：
 
 ![mark](https://res.cloudinary.com/dherizchh/image/upload/v1549508185/qrcode_for_gh_65701a2ee4d5_344.jpg)
